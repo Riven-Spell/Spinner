@@ -37,6 +37,8 @@ type LifecycleManager interface {
 	// CreateRoutine adds a waiter to the underlying WaitGroup.
 	// This is intended for primary routines only. Child routines should use their own suicide methods.
 	CreateRoutine(func())
+	
+	// TODO: Add logging to lcm
 }
 
 type lifecycleManager struct {

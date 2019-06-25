@@ -23,6 +23,8 @@ var rootCmd = &cobra.Command{
 			os.Exit(common.EExitCode.FailedVerify().Code)
 		}
 		
+		// TODO: Start bot & CLI frontend routines
+		
 		lcm.SurrenderControl()
 	},
 }
