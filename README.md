@@ -10,13 +10,7 @@ The goal of Spinner is to re-create that and make similar features.
 
 ## Usage
 
-You can supply an OAuth bot token in one of two ways:
 
-```
-./Spinner <token>
-```
-
-or
 
 ```
 ./Spinner --token <token>

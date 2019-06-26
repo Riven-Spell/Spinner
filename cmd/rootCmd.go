@@ -13,7 +13,7 @@ var rootCmd = &cobra.Command{
 	Use: "spinner",
 	Short: "Social-game discord bot to randomly connect users",
 	Long: `Social-game discord bot to randomly connect users
-				Built with love by Virepri (github.com/Virepri/Spinner)`,
+Built with love by Virepri (github.com/Virepri/Spinner)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		lcm := common.GetLifecycleManager()
 		

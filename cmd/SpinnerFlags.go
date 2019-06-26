@@ -9,8 +9,8 @@ type SpinnerFlags struct {
 }
 
 func (s SpinnerFlags) Verify(args []string) error {
-	// TODO: Decide on whether --token should be explicit or not
-	if s.OAuthToken == "" && len(args) == 0 {
+	// Token must be explicit.
+	if s.OAuthToken == "" {
 		return errors.New("oauth token must be supplied")
 	}
 
