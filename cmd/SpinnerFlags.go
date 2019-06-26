@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,6 +16,7 @@ type SpinnerFlags struct {
 	OAuthToken  string
 	LogLevel    string
 	LogLocation string
+	LogfileOnly bool
 }
 
 func (s SpinnerFlags) Cook(args []string, lcm common.LifecycleManager) error {
@@ -31,17 +33,37 @@ func (s SpinnerFlags) Cook(args []string, lcm common.LifecycleManager) error {
 			fileName = filepath.Join(s.LogLocation, fileName)
 
 			if f, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666); err == nil {
-				lcm.SetLogDestination(f)
+				if !s.LogfileOnly {
+					lcm.SetLogDestination(&common.RedirectWriter{
+						UnderlyingWriters: []io.Writer{
+							os.Stdout,
+							f,
+						},
+					})
+				} else {
+					lcm.SetLogDestination(f)
+				}
 			} else {
 				return errors.New(fmt.Sprintf("could not create file %s: %s", fileName, err))
 			}
 		} else {
 			if f, err := os.OpenFile(s.LogLocation, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666); err == nil {
-				lcm.SetLogDestination(f)
+				if !s.LogfileOnly {
+					lcm.SetLogDestination(&common.RedirectWriter{
+						UnderlyingWriters: []io.Writer{
+							os.Stdout,
+							f,
+						},
+					})
+				} else {
+					lcm.SetLogDestination(f)
+				}
 			} else {
 				return errors.New(fmt.Sprintf("could not create file %s: %s", s.LogLocation, err))
 			}
 		}
+	} else if s.LogfileOnly {
+		return errors.New(fmt.Sprintf("--logfile-only requires a specified logfile (--log-file)"))
 	}
 
 	if v, exists := common.MLogLevel[strings.ToLower(s.LogLevel)]; s.LogLevel != "" {

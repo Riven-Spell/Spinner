@@ -30,7 +30,10 @@ Built with love by Virepri (github.com/Virepri/Spinner)`,
 			Token: sf.OAuthToken,
 		}))
 
-		lcm.SurrenderControl()
+		x, _ := lcm.SurrenderControl()
+		if x != nil {
+			os.Exit(x.Code)
+		}
 	},
 }
 
@@ -38,6 +41,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&sf.OAuthToken, "token", "", "Supply your bot's OAuth token")
 	rootCmd.PersistentFlags().StringVar(&sf.LogLevel, "log-level", "", "Set the minimum logging level.")
 	rootCmd.PersistentFlags().StringVar(&sf.LogLocation, "log-location", "", "Set where logs are dumped. Appends to individual files, and creates new files in directories.")
+	rootCmd.PersistentFlags().BoolVar(&sf.LogfileOnly, "logfile-only", false, "Log ONLY to the specified file.")
 }
 
 func Execute() {
