@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/virepri/Spinner/cliFE"
 	"github.com/virepri/Spinner/common"
 )
 
@@ -22,7 +23,8 @@ Built with love by Virepri (github.com/Virepri/Spinner)`,
 			os.Exit(common.EExitCode.FailedVerify().Code)
 		}
 
-		// TODO: Start bot & CLI frontend routines
+		// TODO: Start bot routine
+		lcm.CreateRoutine(cliFE.RunCLI)
 
 		lcm.SurrenderControl()
 	},
