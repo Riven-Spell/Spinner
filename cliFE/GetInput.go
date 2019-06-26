@@ -4,14 +4,17 @@ import (
 	"bufio"
 	"runtime"
 	"strings"
+
+	"github.com/virepri/Spinner/common"
 )
 
 var cliReader *bufio.Reader
 
 func getCLIInput() []string {
-	buffer, _, err := cliReader.ReadLine()
+	buffer, err := cliReader.ReadString(byte('\n'))
 
 	if err != nil {
+		common.GetLifecycleManager().Suicide(err, common.EExitCode.FailedDiscordGo())
 		return nil
 	}
 

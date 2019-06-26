@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/virepri/Spinner/botFE"
 	"github.com/virepri/Spinner/cliFE"
 	"github.com/virepri/Spinner/common"
 )
@@ -23,8 +24,11 @@ Built with love by Virepri (github.com/Virepri/Spinner)`,
 			os.Exit(common.EExitCode.FailedVerify().Code)
 		}
 
-		// TODO: Start bot routine
+		lcm.Log("Spinner "+common.Version, common.ELogLevel.Information())
 		lcm.CreateRoutine(cliFE.RunCLI)
+		lcm.CreateRoutine(botFE.BakeRunBot(botFE.BotParameters{
+			Token: sf.OAuthToken,
+		}))
 
 		lcm.SurrenderControl()
 	},

@@ -20,8 +20,8 @@ func GetLifecycleManager() LifecycleManager {
 
 func makeLifecycleManager() {
 	lcm = &lifecycleManager{
-		shutdownChan:    make(chan int, 10),    // There will probably never be more than 1 in shutdownChan or 10 in suicideResults
-		suicideResults:  make(chan error, 500), // But it's best to be safer than sorry.
+		shutdownChan:    make(chan ExitCode, 10), // There will probably never be more than 1 in shutdownChan or 10 in suicideResults
+		suicideResults:  make(chan error, 500),   // But it's best to be safer than sorry.
 		logDestination:  os.Stdout,
 		minimumLogLevel: ELogLevel.Information(),
 	}
@@ -31,14 +31,14 @@ type LifecycleManager interface {
 	// ===== Routine Wrangling =====
 
 	// SurrenderControl blocks until Shutdown or Suicide is called.
-	SurrenderControl() (*int, []error)
+	SurrenderControl() (*ExitCode, []error)
 
 	// Shutdown gracefully shuts down the app.
-	Shutdown(exitCode int)
+	Shutdown(exitCode ExitCode)
 	// Suicide gracefully shuts down the app and displays an error.
-	Suicide(err error, exitCode int)
+	Suicide(err error, exitCode ExitCode)
 	// WatchForShutdown returns the underlying shutdownChan. Useful inside select statements.
-	WatchForShutdown() chan int
+	WatchForShutdown() chan ExitCode
 
 	// CreateRoutine adds a waiter to the underlying WaitGroup.
 	// This is intended for primary routines only. Child routines should use their own suicide methods.
@@ -57,7 +57,7 @@ type LifecycleManager interface {
 type lifecycleManager struct {
 	// Routine wranglers
 	routines       sync.WaitGroup
-	shutdownChan   chan int
+	shutdownChan   chan ExitCode
 	suicideResults chan error
 
 	// Logging
@@ -65,8 +65,11 @@ type lifecycleManager struct {
 	minimumLogLevel LogLevel
 }
 
-func (lcm *lifecycleManager) SurrenderControl() (*int, []error) {
+func (lcm *lifecycleManager) SurrenderControl() (*ExitCode, []error) {
 	lcm.routines.Wait()
+
+	//noinspection GoPrintFunctions
+	fmt.Println("\n") // Everything's closing out, create a clean exit line.
 
 	errorOut := make([]error, len(lcm.suicideResults))
 	errorIndex := 0
@@ -83,28 +86,29 @@ func (lcm *lifecycleManager) SurrenderControl() (*int, []error) {
 
 	if len(lcm.shutdownChan) != 0 {
 		x := <-lcm.shutdownChan
+		fmt.Printf("Exiting with code %d: %s\n", x.Code, x.Reason)
 		return &x, errorOut
 	}
 
 	return nil, errorOut
 }
 
-func (lcm *lifecycleManager) Shutdown(exitCode int) {
+func (lcm *lifecycleManager) Shutdown(exitCode ExitCode) {
 	lcm.shutdownChan <- exitCode
 }
 
-func (lcm *lifecycleManager) Suicide(err error, exitCode int) {
+func (lcm *lifecycleManager) Suicide(err error, exitCode ExitCode) {
 	lcm.suicideResults <- err
 	lcm.shutdownChan <- exitCode
 }
 
-func (lcm *lifecycleManager) WatchForShutdown() chan int {
+func (lcm *lifecycleManager) WatchForShutdown() chan ExitCode {
 	return lcm.shutdownChan
 }
 
 func (lcm *lifecycleManager) CreateRoutine(routine func()) {
 	if routine == nil {
-		lcm.Suicide(errors.New("empty routine supplied to CreateRoutine"), -2)
+		lcm.Suicide(errors.New("empty routine supplied to CreateRoutine"), EExitCode.NilRoutine())
 		return
 	}
 

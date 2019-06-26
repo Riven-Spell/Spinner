@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	cloud.google.com/go v0.40.0 // indirect
-	github.com/bwmarrin/discordgo v0.19.0 // indirect
+	github.com/bwmarrin/discordgo v0.19.0
 	github.com/coreos/bbolt v1.3.3 // indirect
 	github.com/coreos/etcd v3.3.13+incompatible // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect

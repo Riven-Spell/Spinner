@@ -15,14 +15,16 @@ func RunCLI() {
 
 	for {
 		go func() {
+			fmt.Print("> ")
 			cmdChan <- getCLIInput()
 		}()
 
 		select {
 		case exitCode := <-lcm.WatchForShutdown():
 			lcm.Shutdown(exitCode)
+			return
 		case cmd := <-cmdChan:
-			fmt.Println(cmd) // TODO: parse and handle CLI commands
+			fmt.Println("command ", cmd) // TODO: parse and handle CLI commands
 		}
 	}
 }
