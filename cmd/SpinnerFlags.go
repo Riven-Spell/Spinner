@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/virepri/Spinner/common"
 )
@@ -24,14 +26,21 @@ func (s SpinnerFlags) Cook(args []string, lcm common.LifecycleManager) error {
 	if s.LogLocation != "" {
 		fi, err := os.Stat(s.LogLocation)
 
-		if err != nil {
-			return errors.New(fmt.Sprintf("invalid log location specified: %s", err))
-		}
+		if err == nil && fi.IsDir() {
+			fileName := time.Now().Format(time.RFC1123) + ".txt"
+			fileName = filepath.Join(s.LogLocation, fileName)
 
-		if fi.IsDir() {
-			// TODO: Open a file under this directory.
+			if f, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666); err == nil {
+				lcm.SetLogDestination(f)
+			} else {
+				return errors.New(fmt.Sprintf("could not create file %s: %s", fileName, err))
+			}
 		} else {
-			// TODO: Open and append to the file itself.
+			if f, err := os.OpenFile(s.LogLocation, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666); err == nil {
+				lcm.SetLogDestination(f)
+			} else {
+				return errors.New(fmt.Sprintf("could not create file %s: %s", s.LogLocation, err))
+			}
 		}
 	}
 

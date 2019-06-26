@@ -74,10 +74,7 @@ func (lcm *lifecycleManager) SurrenderControl() (*int, []error) {
 		err := <-lcm.suicideResults
 
 		if err != nil {
-			fmt.Println("================ START FATAL ERROR ================")
-			fmt.Println(err)
-			fmt.Println("================  END FATAL ERROR  ================")
-			fmt.Println()
+			lcm.Log(err.Error(), ELogLevel.Fatal())
 		}
 
 		errorOut[errorIndex] = err
