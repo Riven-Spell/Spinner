@@ -11,6 +11,7 @@ import (
 var commands = map[string]func(*discordgo.Session, *discordgo.MessageCreate, []string){
 	"ping":   Ping, // Sample command to make sure this structure works.
 	"invite": Invite,
+	"help":   Help,
 }
 
 func Ping(discord *discordgo.Session, message *discordgo.MessageCreate, params []string) {
@@ -26,5 +27,28 @@ func Invite(discord *discordgo.Session, message *discordgo.MessageCreate, params
 
 	if err != nil {
 		lcm.Log(fmt.Sprintf("Failed to respond to invite command, %s", err.Error()), common.ELogLevel.Error())
+	}
+}
+
+func Help(discord *discordgo.Session, message *discordgo.MessageCreate, params []string) {
+	_, err := discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("%s, I've sent you the help texts in your DMs.", message.Author.Username))
+
+	if err != nil {
+		lcm.Log(fmt.Sprintf("Failed to respond to help command, %s", err.Error()), common.ELogLevel.Error())
+		return
+	}
+
+	userCh, err := discord.UserChannelCreate(message.Author.ID)
+
+	if err != nil || userCh == nil {
+		lcm.Log(fmt.Sprintf("Failed to get user channel when sending help: %s", err), common.ELogLevel.Error())
+	}
+
+	for _, v := range craftHelpMessages() {
+		_, err := discord.ChannelMessageSend(userCh.ID, v)
+
+		if err != nil {
+			lcm.Log(fmt.Sprintf("Failed to write a help message to user's DMs: %s", err), common.ELogLevel.Error())
+		}
 	}
 }

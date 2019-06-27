@@ -22,6 +22,7 @@ func BakeRunBot(params BotParameters) func() {
 }
 
 func runBot(params BotParameters) {
+	common.BotVars.HostGuild = params.HostGuild
 	discord, err := discordgo.New("Bot " + params.Token)
 	defer discord.Close()
 	lcm = common.GetLifecycleManager()
@@ -43,8 +44,8 @@ func runBot(params BotParameters) {
 	SetupGuildList(discord)
 
 	// TODO: Setup guild functions.
-	if _, ok := common.BotVars.Guilds[params.HostGuild]; params.HostGuild != "" && !ok {
-		lcm.Log(fmt.Sprintf("Could not locate host guild %s.", params.HostGuild), common.ELogLevel.Warning())
+	if _, ok := common.BotVars.Guilds[common.BotVars.HostGuild]; common.BotVars.HostGuild != "" && !ok {
+		lcm.Log(fmt.Sprintf("Could not locate host guild %s.", common.BotVars.HostGuild), common.ELogLevel.Warning())
 	} else {
 		// TODO: Create listmissing command
 		lcm.Log("No host guild has been selected. Some features will not be available. Run the command \"listmissing\" to find out what you're missing out on.", common.ELogLevel.Warning())

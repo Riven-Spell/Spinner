@@ -33,7 +33,7 @@ func RunCLI() {
 			if c, ok := commands[cmd[0]]; ok {
 				c(cmd[1:])
 			} else {
-				lcm.Log(fmt.Sprintf("%s is not a valid command.", cmd[0]), common.ELogLevel.Information())
+				fmt.Printf("%s is not a valid command.\n", cmd[0])
 			}
 		}
 	}
