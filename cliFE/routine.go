@@ -11,6 +11,7 @@ import (
 func RunCLI() {
 	cliReader = bufio.NewReader(os.Stdin)
 	cmdChan := make(chan []string)
+	common.CliVars.Initialized = true
 	lcm := common.GetLifecycleManager() // Gets global lifecycle manager
 
 	for {

@@ -129,7 +129,14 @@ func (lcm *lifecycleManager) SetMinimumLogLevel(minimum LogLevel) {
 
 func (lcm *lifecycleManager) Log(Input string, severity LogLevel) {
 	if CanLog(lcm.minimumLogLevel, severity) {
+		splitDest := false
+		if _, splitDest = lcm.logDestination.(*RedirectWriter); (splitDest || lcm.logDestination == os.Stdout) && CliVars.Initialized {
+			fmt.Println()
+		}
 		_, err := lcm.logDestination.Write([]byte(fmt.Sprintf("%s: %s\n", severity.Type, Input)))
+		if (splitDest || lcm.logDestination == os.Stdout) && CliVars.Initialized {
+			fmt.Print("> ") // Get the console out of the way.
+		}
 
 		if err != nil {
 			fmt.Println("WARNING: Failed to write following line to log destination...")
