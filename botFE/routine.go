@@ -46,7 +46,7 @@ func runBot(params BotParameters) {
 	// TODO: Setup guild functions.
 	if _, ok := common.BotVars.Guilds[common.BotVars.HostGuild]; common.BotVars.HostGuild != "" && !ok {
 		lcm.Log(fmt.Sprintf("Could not locate host guild %s.", common.BotVars.HostGuild), common.ELogLevel.Warning())
-	} else {
+	} else if !ok {
 		// TODO: Create listmissing command
 		lcm.Log("No host guild has been selected. Some features will not be available. Run the command \"listmissing\" to find out what you're missing out on.", common.ELogLevel.Warning())
 	}

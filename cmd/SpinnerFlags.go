@@ -17,6 +17,7 @@ type SpinnerFlags struct {
 	LogLevel    string
 	LogLocation string
 	LogfileOnly bool
+	HostGuild   string
 }
 
 func (s SpinnerFlags) Cook(args []string, lcm common.LifecycleManager) error {

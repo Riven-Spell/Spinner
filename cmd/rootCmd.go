@@ -27,7 +27,8 @@ Built with love by Virepri (github.com/Virepri/Spinner)`,
 		lcm.Log("Spinner "+common.Version, common.ELogLevel.Information())
 		lcm.CreateRoutine(cliFE.RunCLI)
 		lcm.CreateRoutine(botFE.BakeRunBot(botFE.BotParameters{
-			Token: sf.OAuthToken,
+			Token:     sf.OAuthToken,
+			HostGuild: sf.HostGuild,
 		}))
 
 		x, _ := lcm.SurrenderControl()
@@ -42,6 +43,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&sf.LogLevel, "log-level", "", "Set the minimum logging level.")
 	rootCmd.PersistentFlags().StringVar(&sf.LogLocation, "log-location", "", "Set where logs are dumped. Appends to individual files, and creates new files in directories.")
 	rootCmd.PersistentFlags().BoolVar(&sf.LogfileOnly, "logfile-only", false, "Log ONLY to the specified file.")
+	rootCmd.PersistentFlags().StringVar(&sf.HostGuild, "host-guild", "", "Set host guild.")
 }
 
 func Execute() {
